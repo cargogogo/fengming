@@ -24,7 +24,8 @@ type Task struct {
 
 // AgentStatus ...
 type AgentStatus struct {
-	Name  string
-	Addr  string // ip:port
-	Tasks []Task
+	Name           string
+	Addr           string // ip:port
+	APIPushTorrent string // POST http://ip:port/torrent
+	Tasks          []Task
 }
