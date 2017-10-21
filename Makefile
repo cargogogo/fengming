@@ -1,6 +1,5 @@
 .PHONY: build
 
-
 ImageDestBase=index-dev.qiniu.io/kelibrary/fengming
 
 PACKAGES = $(shell go list ./... | grep -v /vendor/ | grep -v /dashboard/)

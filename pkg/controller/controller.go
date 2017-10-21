@@ -1,24 +1,22 @@
 package controller
 
 import (
-	"os"
-	"time"
-
-	"github.com/anacrolix/torrent/bencode"
-	"github.com/anacrolix/torrent/metainfo"
+	"github.com/cargogogo/fengming/pkg/common"
 )
 
 type ControllerI interface {
 	// CreateTorrent creates a torrent file from raw data path.
 	CreateTorrent(rawDataPath, targetTorrent string) error
 
+	// SeedTorrent seeds the data.
+	SeedTorrent(torrentFile, listenAddr string) error
+
 	// DistrbuteTorrent distribute a torrent file to the hosts.
 	DistributeTorrent(torrent string, hosts []string) error
 }
 
 type ControllerConfig struct {
-	AnnounceList [][]string // tracker addresses
-	PieceLength  int64      // data chunk size
+	TrackerAddr string
 }
 
 type controller struct {
@@ -31,33 +29,12 @@ func NewController(cfg *ControllerConfig) (ControllerI, error) {
 	}, nil
 }
 
-func (c *controller) CreateTorrent(dataDir, targetTorrent string) error {
-	mi := metainfo.MetaInfo{
-		AnnounceList: c.config.AnnounceList,
-		Comment:      "Distribute images based on P2P",
-		CreatedBy:    "FengMing",
-		CreationDate: time.Now().Unix(),
-	}
+func (c *controller) CreateTorrent(dataPath, torrentFile string) error {
+	return common.CreateTorrentFile(c.config.TrackerAddr, dataPath, torrentFile)
+}
 
-	info := metainfo.Info{
-		PieceLength: c.config.PieceLength,
-	}
-	if err := info.BuildFromFilePath(dataDir); err != nil {
-		return err
-	}
-
-	var err error
-	if mi.InfoBytes, err = bencode.Marshal(info); err != nil {
-		return err
-	}
-
-	fp, err := os.Create(targetTorrent)
-	if err != nil {
-		return err
-	}
-	defer fp.Close()
-
-	return mi.Write(fp)
+func (c *controller) SeedTorrent(torrentFile, listenAddr string) error {
+	return common.PullFromTorrent(torrentFile, true, listenAddr)
 }
 
 func (c *controller) DistributeTorrent(torrent string, hosts []string) error {
