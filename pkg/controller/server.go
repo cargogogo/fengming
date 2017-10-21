@@ -3,19 +3,24 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/cargogogo/fengming/model"
 )
 
 const ActionPush = "push"
 
-type AgentInfo struct {
-	Name string `json:"name"`
-	Host string `json:"host"`
-}
+const (
+	MinPort = 20000
+	MaxPort = 30000
+)
 
 type ServerConfig struct {
 	Addr string
@@ -37,7 +42,11 @@ type Server struct {
 
 	logger *log.Entry
 
-	agents []AgentInfo
+	agents []model.AgentStatus
+}
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 func NewServer(cfg *ServerConfig) (*Server, error) {
@@ -94,7 +103,7 @@ func (s *Server) RegistryHook(c *gin.Context) {
 	dataDir := filepath.Join(s.config.RegistryBlobPath, digest[:2], digest)
 	s.logger.Infof("dataDir: %s", dataDir)
 
-	// TODO: Make a torrent file for one layer of docker image.
+	// Make a torrent file for one layer of docker image.
 	// Note: the torrent file should be with the data dir.
 	torrentFile := digest + ".torrent"
 	if err := s.controller.CreateTorrent(dataDir, torrentFile); err != nil {
@@ -104,7 +113,18 @@ func (s *Server) RegistryHook(c *gin.Context) {
 		return
 	}
 
+	// Seed the torrent.
+	// TODO: It's better to assign the port by a service other than using random
+	// port.
+	port := MinPort + rand.Intn(MaxPort-MinPort)
+	seedListenAddr := fmt.Sprintf("%s:%d", strings.Split(s.config.Addr, ":")[0], port)
+	s.logger.Infof("listen addr: %s", seedListenAddr)
+	s.SeedTorrent(torrentFile, seedListenAddr)
+
 	// TODO: Distribute the torrent file.
+	for _, agent := range s.agents {
+		_ = agent
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "register hook",
@@ -112,17 +132,17 @@ func (s *Server) RegistryHook(c *gin.Context) {
 }
 
 func (s *Server) AgentHeartbeat(c *gin.Context) {
-	var agentInfo AgentInfo
+	var agentStatus model.AgentStatus
 	decoder := json.NewDecoder(c.Request.Body)
-	if err := decoder.Decode(&agentInfo); err != nil {
+	if err := decoder.Decode(&agentStatus); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": fmt.Sprintf("Failed to unmarshal agent data: %s", err),
 		})
 		return
 	}
-	s.logger.Infof("Receive agent heartbeat: %v", agentInfo)
+	s.logger.Infof("Receive agent heartbeat: %v", agentStatus)
 
-	s.agents = append(s.agents, agentInfo)
+	s.agents = append(s.agents, agentStatus)
 
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "ok from AgentHeartbeat",
@@ -133,4 +153,9 @@ func (s *Server) AgentsInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "ok from AgentsInfo",
 	})
+}
+
+// TODO: Add timeout.
+func (s *Server) SeedTorrent(torrentFile, listenAddr string) {
+	go s.controller.SeedTorrent(torrentFile, listenAddr)
 }
