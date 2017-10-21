@@ -13,7 +13,7 @@ type AgentConfig struct {
 	ReportInterval time.Duration
 }
 
-// Task ...
+// Task ... controller ->agent
 type Task struct {
 	ID          string
 	LayerName   string
@@ -22,7 +22,7 @@ type Task struct {
 	TorrentPath string
 }
 
-// AgentStatus ...
+// AgentStatus agent -> controller
 type AgentStatus struct {
 	Name  string
 	Addr  string // ip:port
