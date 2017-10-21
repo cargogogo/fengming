@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/cargogogo/fengming/model"
+	"github.com/cargogogo/fengming/utils/header"
 	_ "github.com/cargogogo/fengming/utils/loghook"
 	"github.com/cargogogo/fengming/utils/reqlog"
 )
@@ -20,6 +21,9 @@ func Load(cfg *model.AgentConfig) http.Handler {
 	e := gin.New()
 	e.Use(gin.Recovery())
 
+	e.Use(header.Secure)
+	e.Use(header.Options)
+
 	e.Use(reqlog.ReqLoggerMiddleware(logrus.New(), time.RFC3339, true))
 
 	svc := New(cfg)
@@ -28,7 +32,27 @@ func Load(cfg *model.AgentConfig) http.Handler {
 	v1group := e.Group("/v1")
 	{
 		v1group.POST("/task", svc.PostTask)
+		v1group.GET("/test", test)
 	}
 
 	return e
+}
+
+func test(c *gin.Context) {
+	agents := []model.AgentStatus{}
+	for i := 1; i < 3; i++ {
+		status := model.AgentStatus{
+			Name: "123",
+			Addr: "1.1.1.1:2222",
+		}
+		for i := 1; i < 3; i++ {
+			status.Tasks = append(status.Tasks, model.Task{
+				ID:        "12123",
+				LayerName: "12w123213",
+				Status:    "complete",
+			})
+		}
+		agents = append(agents, status)
+	}
+	c.JSON(200, agents)
 }

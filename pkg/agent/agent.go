@@ -23,7 +23,9 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-var portStart = 21000
+var constPortStart = 21000
+var portStart = constPortStart
+var constPortEnd = 22000
 var portLock sync.RWMutex
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -58,6 +60,7 @@ func (s *Service) PostTask(c *gin.Context) {
 	c.AbortWithStatus(200)
 	t := &model.Task{}
 	t.ID = randStringRunes(10)
+	t.Status = "downloading"
 	err := c.BindJSON(t)
 	if err != nil {
 		c.AbortWithError(400, err)
@@ -86,7 +89,9 @@ func (s *Service) reportStatus() {
 	defer s.tasklock.RUnlock()
 	taskcopy := []model.Task{}
 	for _, t := range s.taskqueue {
-		taskcopy = append(taskcopy, *t)
+		a := *t
+		a.Torrent = []byte{}
+		taskcopy = append(taskcopy, a)
 	}
 	status := &model.AgentStatus{
 		Name:  s.NodeName,
@@ -127,7 +132,6 @@ func (s *Service) taskrun(t *model.Task) {
 		logrus.Error(err)
 		t.Status = "fail"
 	}
-	s.rmtask(t)
 }
 
 func (s *Service) checkLayerExsit(t *model.Task) bool {
@@ -139,6 +143,9 @@ func (s *Service) updateTask(t *model.Task) {
 	defer s.tasklock.Unlock()
 	if a, ok := s.taskqueue[t.ID]; ok {
 		a.Status = t.Status
+		if a.Status == "finish" {
+			delete(s.taskqueue, t.ID)
+		}
 	}
 }
 
@@ -150,6 +157,9 @@ func (s *Service) downloadTask(t *model.Task) error {
 	}()
 	portLock.Lock()
 	portStart++
+	if portStart == constPortEnd {
+		portStart = constPortStart
+	}
 	portLock.Unlock()
 	loader := layerloader{
 		task:   *t,

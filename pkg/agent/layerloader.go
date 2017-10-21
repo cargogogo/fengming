@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
-
 	"github.com/cargogogo/fengming/model"
 
 	"github.com/dustin/go-humanize"
@@ -20,7 +18,7 @@ import (
 func (d *layerloader) updatestatus(t *torrent.Torrent) {
 	timeout := make(chan bool, 1)
 	go func() {
-		time.Sleep(time.Hour * 1) // sleep one second
+		time.Sleep(time.Minute * 10) // sleep one second
 		timeout <- true
 	}()
 	for {
@@ -35,8 +33,6 @@ func (d *layerloader) updatestatus(t *torrent.Torrent) {
 		} else if t.BytesCompleted() == t.Info().TotalLength() {
 			d.task.Status = "completed"
 			d.upfunc(&d.task)
-			logrus.Debug("complete task")
-			return
 		} else {
 			d.task.Status = fmt.Sprintf("downloading (%s/%s)", humanize.Bytes(uint64(t.BytesCompleted())), humanize.Bytes(uint64(t.Info().TotalLength())))
 			d.upfunc(&d.task)
@@ -84,7 +80,12 @@ func (d *layerloader) load() error {
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	defer func() {
+		time.Sleep(time.Minute * 9)
+		client.Close()
+		d.task.Status = "finish"
+		d.upfunc(&d.task)
+	}()
 
 	err = d.addTorrents(client)
 	if client.WaitAll() {

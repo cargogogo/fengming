@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col-md-2">
+        <md-sidenav #sidenav mode="side" opened="true">
+            <md-nav-list>
+                <md-list-item> Agents </md-list-item>
+                <md-divider></md-divider>
+            </md-nav-list>
+        </md-sidenav>
+    </div>
+    <div class="col-md-10">
+        <md-toolbar>BT download staus</md-toolbar>
+        <div style="margin-left:auto; margin-right:0;">
+            <button md-button (click)="table.rowDetail.expandAllRows()">Expand All</button>
+            <button md-button (click)="table.rowDetail.collapseAllRows()">Collapse All</button>
+        </div>
+        <ngx-datatable #myTable class='material expandable' [rows]="agents" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+            <ngx-datatable-row-detail [rowHeight]="getRowHeight" #myDetailRow (toggle)="onDetailToggle($event)">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                    <div style="padding-left:10px;">
+                        <ngx-datatable [rows]="row.Tasks" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" class="material striped ngx-datatable ">
+                            <ngx-datatable-column name="TaskName">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    {{row.ID}}
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="LayerName">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    {{row.LayerName}}
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    {{row.Status}}
+                                </ng-template>
+                            </ngx-datatable-column>
+                        </ngx-datatable>
+                    </div>
+                </ng-template>
+            </ngx-datatable-row-detail>
+            <ngx-datatable-column [width]="50" [resizeable]="false" [sortable]="false" [draggable]="false" [canAutoResize]="false">
+                <ng-template let-row="row" let-expanded="expand" ngx-datatable-cell-template>
+                    <a [class.datatable-icon-right]="!expand" [class.datatable-icon-down]="expand" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+                    </a>
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Agent Name">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.Name}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Addr">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.Addr}}
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Current TaskCount">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.Tasks.length}}
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>
