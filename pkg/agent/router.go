@@ -22,7 +22,8 @@ func Load(cfg *model.AgentConfig) http.Handler {
 
 	e.Use(reqlog.ReqLoggerMiddleware(logrus.New(), time.RFC3339, true))
 
-	svc := AgentService{cfg}
+	svc := New(cfg)
+	go svc.Run()
 
 	v1group := e.Group("/v1")
 	{

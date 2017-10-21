@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/ianschenck/envflag"
@@ -42,6 +43,18 @@ var ServeCommand = cli.Command{
 			Name:   "node-name",
 			Usage:  "node name",
 		},
+		cli.DurationFlag{
+			EnvVar: "REPORT_INTERVAL",
+			Name:   "report-interval",
+			Usage:  "node name",
+			Value:  time.Second * 5,
+		},
+		cli.StringFlag{
+			EnvVar: "DOWN_DIR",
+			Name:   "download-dir",
+			Usage:  "download dir",
+			Value:  "/tmp",
+		},
 	},
 }
 
@@ -53,6 +66,12 @@ func server(c *cli.Context) error {
 		logrus.SetLevel(logrus.WarnLevel)
 	}
 	cfg := &model.AgentConfig{}
+	cfg.MasterAddr = c.String("master-addr")
+	cfg.NodeName = c.String("node-name")
+	cfg.ReportInterval = c.Duration("report-interval")
+	cfg.DownloadDir = c.String("download-dir")
+	cfg.ListenAddr = c.String("server-addr")
+
 	// setup the server and start the listener
 	handler := agent.Load(cfg)
 
