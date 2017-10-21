@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: kube-system
+  name: ke-registry-deploy
+  labels:
+    name: ke-registry-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: ke-registry-app
+    spec:
+      containers:
+      - name: ke-registry
+        image: index-dev.qiniu.io/kelibrary/registry:2.6
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        - containerPort: 5001
+        volumeMounts:
+        - name: config
+          mountPath: /etc/docker/registry
+        - name: storage
+          mountPath: /ke/registry
+        - mountPath: /etc/localtime
+          name: tz-config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: ke-registry-config
+          items:
+          - key: config
+            path: config.yml
+      - hostPath: 
+          path: /data/registry
+        name: storage 
+      - hostPath:
+          path: /usr/share/zoneinfo/Asia/Shanghai
+        name: tz-config 
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname 
+                operator: In
+                values:
+                - kube-minion-2 

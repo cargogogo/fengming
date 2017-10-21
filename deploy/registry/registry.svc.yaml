@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: ke-registry
+spec:
+  type: NodePort
+  ports:
+    - name: repo
+      port: 5000
+      nodePort: 31500
+    - name: debug
+      port: 5001
+  selector:
+    name: ke-registry-app
