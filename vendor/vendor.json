@@ -1,0 +1,81 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "83niXAKchIDM9NZepVjUz6DvPgM=",
+			"path": "github.com/anacrolix/missinggo",
+			"revision": "1b975e2f93af0b40673a9f258e2cb8854bc7975c",
+			"revisionTime": "2017-10-12T05:48:52Z"
+		},
+		{
+			"checksumSHA1": "eOvBfwK3itXzzi9yYKTQlngDlw8=",
+			"path": "github.com/anacrolix/missinggo/slices",
+			"revision": "1b975e2f93af0b40673a9f258e2cb8854bc7975c",
+			"revisionTime": "2017-10-12T05:48:52Z"
+		},
+		{
+			"checksumSHA1": "PdZXyoxI/eWnfI+V6sI0lO9lvIA=",
+			"path": "github.com/anacrolix/torrent/bencode",
+			"revision": "2ab850f56e463c66ca78ebacba70c3aec907db0c",
+			"revisionTime": "2017-10-14T05:41:14Z"
+		},
+		{
+			"checksumSHA1": "oMko49SO2uDnsNYTjGG1xcLG/dE=",
+			"path": "github.com/anacrolix/torrent/metainfo",
+			"revision": "2ab850f56e463c66ca78ebacba70c3aec907db0c",
+			"revisionTime": "2017-10-14T05:41:14Z"
+		},
+		{
+			"checksumSHA1": "g2u/xPDHDqYQwJPTtMlB6P97mWY=",
+			"path": "github.com/bradfitz/iter",
+			"revision": "454541ec3da2a73fc34fd049b19ee5777bf19345",
+			"revisionTime": "2014-01-24T04:19:15Z"
+		},
+		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "RIuB6NpT9y5PrneHTfHRKq/r9yU=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "3d84af1ae04512e1bd4fe2b23fc6975db255f79c",
+			"revisionTime": "2017-07-09T17:36:25Z"
+		},
+		{
+			"checksumSHA1": "L8WNMYHKGlN21LnrVhG05OWxwAA=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "ScqHWd1gW9LrFxlYaGOE9RUm3Dg=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "f6abca593680b2315d2075e0f5e2a9751e3f431a",
+			"revisionTime": "2017-06-01T20:57:54Z"
+		},
+		{
+			"checksumSHA1": "85tF+h700YYA4HKj3Ch8Z0pkh2c=",
+			"path": "golang.org/x/net/context",
+			"revision": "1c05540f6879653db88113bc4a2b70aec4bd491f",
+			"revisionTime": "2017-08-04T00:04:37Z"
+		},
+		{
+			"checksumSHA1": "+wh017dqDR40eRa6MqQ6X7Noo/s=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "c84c1ab9fd18cdd4c23dd021c10f5f46dea95e46",
+			"revisionTime": "2017-08-11T22:05:22Z"
+		}
+	],
+	"rootPath": "github.com/cargogogo/fengming"
+}
