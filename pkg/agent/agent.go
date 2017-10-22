@@ -94,9 +94,10 @@ func (s *Service) reportStatus() {
 		taskcopy = append(taskcopy, a)
 	}
 	status := &model.AgentStatus{
-		Name:  s.NodeName,
-		Addr:  s.ListenAddr,
-		Tasks: taskcopy,
+		Name:           s.NodeName,
+		Addr:           s.ListenAddr,
+		APIPushTorrent: "http://" + s.ListenAddr + "/v1/task",
+		Tasks:          taskcopy,
 	}
 	logrus.Debugf("reportStatus: %+v\n", status)
 
