@@ -1,6 +1,7 @@
 package common
 
 import (
+	"bytes"
 	"context"
 	"os/exec"
 )
@@ -8,9 +9,9 @@ import (
 func ExecCmd(ctx context.Context, args []string) ([]byte, error) {
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 
-	output, err := cmd.CombinedOutput()
+	output, err := cmd.Output()
 
-	return output, err
+	return bytes.TrimSpace(output), err
 }
 
 func ExecCmdNoOutput(ctx context.Context, args []string) error {

@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"path/filepath"
@@ -13,6 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/cargogogo/fengming/model"
+	httpClient "github.com/cargogogo/fengming/utils/http"
 )
 
 const ActionPush = "push"
@@ -42,9 +45,11 @@ type Server struct {
 
 	logger *log.Entry
 
-	agents []model.AgentStatus
+	agents map[string]model.AgentStatus
 
 	filter model.Filter
+
+	client httpClient.Client
 }
 
 func init() {
@@ -70,7 +75,9 @@ func NewServer(cfg *ServerConfig) (*Server, error) {
 		config:     cfg,
 		router:     gin.Default(),
 		controller: controller,
+		agents:     map[string]model.AgentStatus{},
 		logger:     logger,
+		client:     httpClient.DefaultClient,
 	}, nil
 }
 
@@ -127,8 +134,28 @@ func (s *Server) RegistryHook(c *gin.Context) {
 	s.SeedTorrent(torrentFile, seedListenAddr)
 
 	// TODO: Distribute the torrent file.
+	dataBytes, err := ioutil.ReadFile(torrentFile)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"msg": fmt.Sprintf("failed to read torrent data: %s", err),
+		})
+		return
+	}
+
+	// TODO: Do this in the background.
+	ctx := context.TODO()
 	for _, agent := range s.agents {
-		_ = agent
+		requestBody := model.Task{
+			LayerName: digest,
+			Torrent:   dataBytes,
+		}
+		var ret interface{}
+		if err := s.client.CallWithJson(ctx, ret, "POST", agent.APIPushTorrent, requestBody); err != nil {
+			s.logger.Warnf("Failed to post torrent %s to %s: %s",
+				torrentFile, agent.Name, err)
+		} else {
+			s.logger.Infof("Successfully post torrent %s to %s", torrentFile, agent.Name)
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -147,7 +174,7 @@ func (s *Server) AgentHeartbeat(c *gin.Context) {
 	}
 	s.logger.Infof("Receive agent heartbeat: %v", agentStatus)
 
-	s.agents = append(s.agents, agentStatus)
+	s.agents[agentStatus.Name] = agentStatus
 
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "ok from AgentHeartbeat",
@@ -156,7 +183,8 @@ func (s *Server) AgentHeartbeat(c *gin.Context) {
 
 func (s *Server) AgentsInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"msg": "ok from AgentsInfo",
+		"msg":    "ok from AgentsInfo",
+		"status": s.agents,
 	})
 }
 

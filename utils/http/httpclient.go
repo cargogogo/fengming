@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	UserAgent = "Golang qiniu/rpc package"
+	UserAgent = "Golang rpc package"
 	UserKey   = "X-User"
 	reqidKey  = 0
 )
