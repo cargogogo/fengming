@@ -29,3 +29,9 @@ type AgentStatus struct {
 	APIPushTorrent string // POST http://ip:port/torrent
 	Tasks          []Task
 }
+
+// Filter ...
+type Filter struct {
+	AgentName string
+	Repo      string
+}

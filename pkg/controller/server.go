@@ -43,6 +43,8 @@ type Server struct {
 	logger *log.Entry
 
 	agents []model.AgentStatus
+
+	filter model.Filter
 }
 
 func init() {
@@ -76,6 +78,9 @@ func (s *Server) Run() error {
 	s.router.POST("/v1/hook", s.RegistryHook)
 	s.router.POST("/v1/agents", s.AgentHeartbeat)
 	s.router.GET("/v1/agents", s.AgentsInfo)
+
+	s.router.GET("/v1/filter", s.GetFilter)
+	s.router.POST("/v1/filter", s.PostFilter)
 
 	return s.router.Run(s.config.Addr)
 }
