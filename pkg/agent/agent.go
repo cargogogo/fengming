@@ -59,13 +59,15 @@ func New(cfg *model.AgentConfig) *Service {
 func (s *Service) PostTask(c *gin.Context) {
 	c.AbortWithStatus(200)
 	t := &model.Task{}
-	t.ID = randStringRunes(10)
-	t.Status = "downloading"
 	err := c.BindJSON(t)
 	if err != nil {
 		c.AbortWithError(400, err)
 		return
 	}
+	t.Status = "downloading"
+	// t.ID = randStringRunes(10)
+	t.ID = t.LayerName
+
 	s.tasks <- t
 	c.JSON(200, gin.H{})
 }
@@ -86,22 +88,23 @@ func (s *Service) Run() {
 
 func (s *Service) reportStatus() {
 	s.tasklock.RLock()
-	defer s.tasklock.RUnlock()
 	taskcopy := []model.Task{}
 	for _, t := range s.taskqueue {
 		a := *t
 		a.Torrent = []byte{}
+		a.ID = t.ID
 		taskcopy = append(taskcopy, a)
 	}
+	s.tasklock.RUnlock()
 	status := &model.AgentStatus{
 		Name:           s.NodeName,
 		Addr:           s.ListenAddr,
 		APIPushTorrent: "http://" + s.ListenAddr + "/v1/task",
 		Tasks:          taskcopy,
 	}
-	logrus.Debugf("reportStatus: %+v\n", status)
+	logrus.Debugf("reportStatus: %d %+v\n", len(status.Tasks), status)
 
-	err := httpclient.DefaultClient.CallWithJson(nil, nil, "POST", s.MasterAddr+"/v1/agents/"+s.NodeName, status)
+	err := httpclient.DefaultClient.CallWithJson(nil, nil, "POST", s.MasterAddr+"/v1/agents", status)
 	if err != nil {
 		logrus.Error(err)
 	}
@@ -125,6 +128,7 @@ func (s *Service) taskrun(t *model.Task) {
 	exsit := s.checkLayerExsit(t)
 	if !exsit {
 		err = s.downloadTask(t)
+		logrus.Debug("downloadTask ", err)
 		if err == nil {
 			err = s.importLayer(t)
 		}
@@ -181,8 +185,10 @@ func (s *Service) downloadTask(t *model.Task) error {
 
 func (s *Service) importLayer(t *model.Task) error {
 	ctx := context.Background()
-	out, err := common.ExecCmd(ctx, []string{"docker", "import", s.DownloadDir + "/" + t.LayerName + "/data"})
-	logrus.Debug("import layer ", out, err)
+	name := s.DownloadDir + "/" + t.LayerName + "/data"
+	logrus.Debug("importing layer ", name)
+	out, err := common.ExecCmd(ctx, []string{"docker", "import", name})
+	logrus.Debug("importing layer ", name, string(out), err)
 	return err
 }
 

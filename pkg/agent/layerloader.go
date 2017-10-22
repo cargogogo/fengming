@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/cargogogo/fengming/model"
 
 	"github.com/dustin/go-humanize"
@@ -81,14 +83,18 @@ func (d *layerloader) load() error {
 		return err
 	}
 	defer func() {
-		time.Sleep(time.Minute * 9)
-		client.Close()
+		go func() {
+			time.Sleep(time.Minute * 9)
+			client.Close()
+		}()
+
 		d.task.Status = "finish"
 		d.upfunc(&d.task)
 	}()
 
 	err = d.addTorrents(client)
 	if client.WaitAll() {
+		logrus.Debug("compelte task ", d.task)
 		return nil
 	}
 	return errors.New("error not sure")
