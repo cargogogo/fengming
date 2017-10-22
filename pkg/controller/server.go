@@ -182,9 +182,14 @@ func (s *Server) AgentHeartbeat(c *gin.Context) {
 }
 
 func (s *Server) AgentsInfo(c *gin.Context) {
+	status := []model.AgentStatus{}
+	for _, agent := range s.agents {
+		status = append(status, agent)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"msg":    "ok from AgentsInfo",
-		"status": s.agents,
+		"status": status,
 	})
 }
 
