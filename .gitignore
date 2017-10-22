@@ -16,3 +16,6 @@
 make/release
 .vscode
 admin.conf
+
+.torrent.bolt.db
+*.torrent

@@ -1,9 +1,7 @@
-package controller
+package main
 
-import (
-	log "github.com/sirupsen/logrus"
-)
+import "github.com/cargogogo/fengming/cmd/controller/app"
 
 func main() {
-	log.Info("Test")
+	app.Execute()
 }
