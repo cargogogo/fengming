@@ -31,7 +31,7 @@ func CreateTorrentFile(trackerAddr, dataPath, torrentFile string) error {
 
 	cmds = []string{
 		CmdTorrentCreate,
-		fmt.Sprintf("-a='udp://%s'", trackerAddr),
+		fmt.Sprintf("-a=udp://%s", trackerAddr),
 		fmt.Sprintf("./%s", filepath.Base(dataPath)),
 	}
 	log.Infof("cmds: %v", cmds)
