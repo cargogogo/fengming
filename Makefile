@@ -17,7 +17,7 @@ all: build_static
 test:
 	go test -cover $(PACKAGES)
 
-build: build_agent build_agent_cross 
+build: build_agent build_agent_cross build_controller
 
 build_agent:
 	mkdir -p make/release
