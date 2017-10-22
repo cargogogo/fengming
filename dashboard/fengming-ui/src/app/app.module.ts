@@ -8,6 +8,7 @@ import { AgentService } from "./service/agent";
 import { AgentListComponent } from "./agent/agent.list";
 import { NgxDatatableModule } from "@swimlane/ngx-datatable";
 import { AppRoutingModule } from "./app-routing.module";
+import { MdDialogModule } from "@angular/material";
 import {
   MdButtonModule,
   MdToolbarModule,
@@ -31,6 +32,7 @@ import { MdCardModule } from "@angular/material";
     MdButtonModule,
     MdToolbarModule,
     MdSidenavModule,
+    MdDialogModule,
     MdInputModule,
     MdCheckboxModule,
     MdListModule,

@@ -10,3 +10,8 @@ export class Task {
   LayerName: string;
   Status: string;
 }
+
+export class Filter {
+  Repo: string;
+  AgentName: string;
+}

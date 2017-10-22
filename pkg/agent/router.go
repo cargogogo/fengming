@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/cargogogo/fengming/model"
 	"github.com/cargogogo/fengming/utils/header"
@@ -33,6 +33,8 @@ func Load(cfg *model.AgentConfig) http.Handler {
 	{
 		v1group.POST("/task", svc.PostTask)
 		v1group.GET("/test", test)
+		v1group.GET("/testfilter", testfilter)
+		v1group.POST("/testfilter", testfilter)
 	}
 
 	return e
@@ -55,4 +57,12 @@ func test(c *gin.Context) {
 		agents = append(agents, status)
 	}
 	c.JSON(200, agents)
+}
+
+func testfilter(c *gin.Context) {
+	filter := &model.Filter{
+		AgentName: "123",
+		Repo:      "456",
+	}
+	c.JSON(200, filter)
 }
