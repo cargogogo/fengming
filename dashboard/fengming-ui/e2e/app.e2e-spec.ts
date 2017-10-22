@@ -1,14 +1,14 @@
-import { YmirUiPage } from './app.po';
+import { FengmingUiPage } from "./app.po";
 
-describe('ymir-ui App', () => {
-  let page: YmirUiPage;
+describe("Fengming-ui App", () => {
+  let page: FengmingUiPage;
 
   beforeEach(() => {
-    page = new YmirUiPage();
+    page = new FengmingUiPage();
   });
 
-  it('should display welcome message', () => {
+  it("should display welcome message", () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to app!');
+    expect(page.getParagraphText()).toEqual("Welcome to app!");
   });
 });
